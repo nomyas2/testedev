@@ -1,0 +1,46 @@
+# CLAUDE.md
+
+Contexto fixo lido automaticamente pelo Claude Code em toda sessão neste repositório.
+
+## Escritório
+
+- **Nome:** Lazzari & Ghidorsi Advogados
+- **Cidade:** Concórdia/SC
+- **Contato do usuário:** sghidorsi.adv@gmail.com
+
+## Áreas de atuação
+
+- Direito bancário (inclusive recuperação de crédito para cooperativas como SICOOB e CRESOL)
+- Direito do consumidor
+- Direito empresarial
+- Direito cível
+
+## Skills disponíveis e quando usar
+
+| Tarefa | Skill |
+| --- | --- |
+| Analisar a íntegra de um processo e avaliar os riscos | `avaliacao-processual` |
+| Redigir contestação, embargos, impugnação, réplica ou manifestação | `elaboracao-defesas` |
+| Triagem de títulos e documentos de dívida para cobrança | `avaliacao-documentos-cobranca` |
+| Proposta de renegociação (Price, convenção Sisbr 2.0) | `geracao-propostas` |
+| Procuração e contrato de honorários | `procuracao-contrato` |
+| Posts para Instagram ou LinkedIn do escritório | `posts-lazzari-ghidorsi` |
+
+Fluxos encadeados:
+- `avaliacao-processual` → bloco HANDOFF-DEFESA → `elaboracao-defesas`
+- `avaliacao-documentos-cobranca` → bloco HANDOFF-COBRANCA → cobrança ou execução
+
+## Preferências de trabalho
+
+- Responder sempre em português do Brasil.
+- Linguagem jurídica técnica, elegante e sem enchimento.
+- Tribunal de referência: TJSC (e STJ para súmulas e temas repetitivos).
+
+## A preencher
+
+<!-- Complete com o que quiser que o Claude sempre saiba. -->
+- Sócios / advogados e OABs:
+- Endereço do escritório:
+- Clientes recorrentes:
+- Preferências de formatação de peças:
+- Outras observações:
