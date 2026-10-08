@@ -1,0 +1,4 @@
+references/guia-redacao.md
+references/registro-caso.md
+scripts/gerar_peca.py
+assets/timbrado-peca.docx
