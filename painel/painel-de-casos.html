@@ -1,0 +1,748 @@
+<title>Painel de Casos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Poppins:wght@400;500;600&display=swap">
+<style>
+/* Layout: mesa de trabalho do escritório. Faixa de números no topo, carteira à esquerda, entrada de registros e prazos à direita. */
+:root {
+  --navy: #1A2A3D;
+  --gold: #A67C3D;
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --surface-2: #EEF0F3;
+  --line: #D9DEE3;
+  --fg: #1A2A3D;
+  --muted: #5E6B78;
+  --danger: #A33A2E;
+  --danger-bg: #F8E6E3;
+  --warn: #8A5A00;
+  --warn-bg: #FBF0D9;
+  --ok: #2F6B4A;
+  --ok-bg: #E2F1E8;
+  --info-bg: #E4EAF1;
+  --focus: #3D6A9E;
+  --display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --body: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --navy: #DCE3EA; --gold: #D7AE6E; --bg: #121A24; --surface: #1A2533; --surface-2: #213044;
+    --line: #2E3F55; --fg: #E6EAEF; --muted: #9AA8B6; --danger: #F0A399; --danger-bg: #3A2020;
+    --warn: #F0C977; --warn-bg: #3A2F17; --ok: #8FD1AA; --ok-bg: #18332A; --info-bg: #22344B;
+    --focus: #8DB5E6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --navy: #DCE3EA; --gold: #D7AE6E; --bg: #121A24; --surface: #1A2533; --surface-2: #213044;
+  --line: #2E3F55; --fg: #E6EAEF; --muted: #9AA8B6; --danger: #F0A399; --danger-bg: #3A2020;
+  --warn: #F0C977; --warn-bg: #3A2F17; --ok: #8FD1AA; --ok-bg: #18332A; --info-bg: #22344B;
+  --focus: #8DB5E6; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; display: grid; gap: 20px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h1 { font-family: var(--display); font-weight: 600; font-size: 28px; color: var(--navy); }
+h2 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h3 { font-family: var(--display); font-weight: 600; font-size: 22px; color: var(--navy); }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+header.top .sub { color: var(--muted); font-size: 13px; }
+header.top .sub em { font-family: var(--display); font-style: italic; color: var(--gold); font-size: 15px; }
+.estado { font-size: 12px; color: var(--muted); }
+
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 2px; min-width: 0; }
+.kpi .v { font-size: 24px; font-weight: 600; color: var(--navy); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kpi .l { font-size: 12px; color: var(--muted); }
+.kpi.alerta .v { color: var(--danger); }
+
+.grade { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.col { display: grid; gap: 20px; min-width: 0; }
+.bloco { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+
+.aviso { border-radius: var(--radius); padding: 10px 14px; font-size: 13px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.aviso.info { background: var(--info-bg); }
+.aviso.erro { background: var(--danger-bg); color: var(--danger); }
+
+.filtros { display: flex; flex-wrap: wrap; gap: 8px; }
+.filtros input { flex: 1 1 220px; min-width: 0; }
+input[type=text], input[type=search], select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+textarea { width: 100%; resize: vertical; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 12px; }
+label.campo { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+label.campo > input, label.campo > select, label.campo > textarea { color: var(--fg); font-size: 14px; font-family: var(--body); }
+
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 8px 14px; cursor: pointer; font-weight: 500; }
+.btn:hover { background: var(--surface-2); }
+.btn.primario { background: var(--navy); border-color: var(--navy); color: var(--bg); }
+.btn.primario:hover { filter: brightness(1.12); background: var(--navy); }
+.btn.perigo { color: var(--danger); border-color: var(--danger); }
+.btn.link { border: 0; background: none; padding: 0; text-decoration: underline; color: inherit; font-weight: 500; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.acoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.tabela { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--surface-2); }
+td .nome { font-weight: 500; }
+td .meta { font-size: 12px; color: var(--muted); }
+td.valor { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+th.valor { text-align: right; }
+.vazio { padding: 28px 12px; text-align: center; color: var(--muted); display: grid; gap: 6px; }
+.vazio strong { color: var(--fg); font-weight: 500; }
+
+.chip { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); white-space: nowrap; }
+.chip.minuta_pronta { background: var(--info-bg); }
+.chip.aguardando_documentos { background: var(--warn-bg); color: var(--warn); }
+.chip.ajuizado, .chip.citado { background: var(--surface-2); }
+.chip.acordo { background: var(--ok-bg); color: var(--ok); }
+.chip.encerrado { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+.chip.exemplo { background: transparent; border: 1px dashed var(--muted); color: var(--muted); }
+.prazo.vencido { color: var(--danger); font-weight: 600; }
+.prazo.proximo { color: var(--warn); font-weight: 600; }
+.trava { color: var(--danger); font-weight: 500; }
+
+.lista-prazos { list-style: none; margin: 0; padding: 0; display: grid; }
+.lista-prazos li { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.lista-prazos li:last-child { border-bottom: 0; }
+.lista-prazos .d { font-variant-numeric: tabular-nums; font-size: 12px; }
+.lista-prazos .t { min-width: 0; overflow-wrap: anywhere; font-size: 13px; }
+.lista-prazos .t span { display: block; color: var(--muted); font-size: 12px; }
+
+.previa { font-size: 13px; display: grid; gap: 6px; }
+.previa ul { margin: 0; padding-left: 18px; }
+
+/* ficha do caso */
+.veu { position: fixed; inset: 0; background: rgba(10, 16, 24, .45); display: flex; justify-content: flex-end; z-index: 10; }
+.ficha { background: var(--bg); width: min(720px, 100%); height: 100%; overflow-y: auto; padding: 20px 16px calc(32px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 16px; align-content: start; border-left: 1px solid var(--line); }
+.ficha .cab { display: flex; gap: 12px; justify-content: space-between; align-items: start; }
+.ficha .cab .meta { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.pares { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 16px; }
+.pares div { min-width: 0; }
+.pares dt { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.pares dd { margin: 0; overflow-wrap: anywhere; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.pend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.pend label { display: flex; gap: 8px; align-items: start; }
+.pend .feita { text-decoration: line-through; color: var(--muted); }
+.historico { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.historico li { border-left: 2px solid var(--line); padding-left: 10px; font-size: 13px; }
+.historico .q { color: var(--muted); font-size: 12px; }
+.confirma { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--danger-bg); color: var(--danger); padding: 10px 12px; border-radius: var(--radius); }
+
+@media (max-width: 960px) {
+  .grade { grid-template-columns: minmax(0, 1fr); }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  table.carteira thead { display: none; }
+  table.carteira, table.carteira tbody, table.carteira tr, table.carteira td { display: block; width: 100%; }
+  table.carteira tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+  table.carteira td { border: 0; padding: 2px 4px; }
+  table.carteira td.valor { text-align: left; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ficha { animation: entra .18s ease-out; }
+  @keyframes entra { from { transform: translateX(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Painel de Casos</h1>
+      <p class="sub">Lazzari &amp; Ghidorsi <em>Advogados</em> · carteira de recuperação de crédito</p>
+    </div>
+    <p class="estado" id="estado">Conectando à base de dados…</p>
+  </header>
+
+  <div id="aviso-geral" hidden></div>
+
+  <section class="kpis" aria-label="Resumo da carteira">
+    <div class="kpi"><span class="v" id="k-casos">0</span><span class="l">casos em andamento</span></div>
+    <div class="kpi"><span class="v" id="k-valor">R$ 0,00</span><span class="l">valor em cobrança (soma das causas)</span></div>
+    <div class="kpi" id="k-prazos-box"><span class="v" id="k-prazos">0</span><span class="l">prazos vencidos ou em até 30 dias</span></div>
+    <div class="kpi" id="k-trava-box"><span class="v" id="k-trava">0</span><span class="l">pendências que travam o ajuizamento</span></div>
+  </section>
+
+  <div class="grade">
+    <div class="col">
+      <section class="bloco" aria-labelledby="t-carteira">
+        <div class="acoes" style="justify-content: space-between;">
+          <h2 id="t-carteira">Carteira</h2>
+          <button class="btn" id="b-csv" type="button" hidden>Baixar planilha (CSV)</button>
+        </div>
+        <div id="faixa-exemplos" class="aviso info" hidden>
+          <span>Os casos marcados como <strong>exemplo</strong> mostram como o painel fica preenchido. Exclua-os quando importar o primeiro caso real.</span>
+          <button class="btn" id="b-excluir-exemplos" type="button">Excluir exemplos</button>
+        </div>
+        <div class="filtros">
+          <input type="search" id="f-busca" placeholder="Buscar por devedor, credor, CPF/CNPJ ou processo" aria-label="Buscar">
+          <select id="f-status" aria-label="Filtrar por situação"><option value="">Todas as situações</option></select>
+          <select id="f-via" aria-label="Filtrar por via"><option value="">Todas as vias</option></select>
+        </div>
+        <div class="tabela">
+          <table class="carteira">
+            <thead><tr><th>Devedor</th><th>Via</th><th>Situação</th><th>Próximo prazo</th><th class="valor">Valor da causa</th></tr></thead>
+            <tbody id="linhas"></tbody>
+          </table>
+          <div class="vazio" id="vazio">
+            <strong>Nenhum caso na carteira ainda.</strong>
+            <span>Cole o bloco REGISTRO-CASO entregue pelas skills na caixa "Importar registro". O caso aparece aqui.</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="bloco" aria-labelledby="t-importar">
+        <h2 id="t-importar">Importar registro</h2>
+        <p style="font-size:13px;color:var(--muted)">Copie o bloco <strong>REGISTRO-CASO</strong> do final da resposta do Claude e cole abaixo. Pode colar vários de uma vez.</p>
+        <textarea id="entrada" rows="7" spellcheck="false" placeholder='```REGISTRO-CASO&#10;{ "chave": "...", ... }&#10;```'></textarea>
+        <div class="acoes">
+          <button class="btn" id="b-ler" type="button">Conferir</button>
+          <button class="btn primario" id="b-importar" type="button" disabled>Importar</button>
+        </div>
+        <div class="previa" id="previa" aria-live="polite"></div>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-prazos">
+        <h2 id="t-prazos">Próximos prazos</h2>
+        <ul class="lista-prazos" id="prazos"></ul>
+        <p class="vazio" id="prazos-vazio" style="padding:8px 0">Nenhum prazo registrado.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="veu" id="veu" hidden>
+  <aside class="ficha" id="ficha" role="dialog" aria-modal="true" aria-labelledby="ficha-titulo"></aside>
+</div>
+
+<script>
+(() => {
+  const STATUS = {
+    minuta_pronta: "Minuta pronta",
+    aguardando_documentos: "Aguardando documentos",
+    ajuizado: "Ajuizado",
+    citado: "Citado",
+    acordo: "Em acordo",
+    encerrado: "Encerrado",
+  };
+  const VIAS = { execucao: "Execução", monitoria: "Monitória", cobranca: "Cobrança" };
+  const PRAZOS = {
+    prescricao_executiva: "Prescrição da via executiva",
+    prescricao_subsidiaria: "Prescrição das vias subsidiárias",
+    processual: "Prazo processual",
+    acordo_parcela: "Parcela de acordo",
+  };
+  const EVENTOS = {
+    triagem: "Triagem dos títulos",
+    minuta_inicial: "Minuta da inicial",
+    proposta: "Proposta de renegociação",
+    acordo_formalizado: "Acordo formalizado",
+    parcela_paga: "Parcela paga",
+    parcela_atrasada: "Parcela em atraso",
+    ajuizado: "Ajuizamento",
+    citado: "Citação",
+    decisao: "Decisão",
+    anotacao: "Anotação",
+    edicao: "Edição no painel",
+  };
+  const MAX_EVENTOS = 80;
+
+  const $ = (id) => document.getElementById(id);
+  const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+  const dinheiro = (v) => (typeof v === "number" && isFinite(v) ? brl.format(v) : "—");
+  const hojeISO = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const dataBR = (iso) => {
+    if (!iso || !/^\d{4}-\d{2}-\d{2}/.test(iso)) return iso || "—";
+    const [a, m, d] = iso.slice(0, 10).split("-");
+    return `${d}/${m}/${a}`;
+  };
+  const diasAte = (iso) => {
+    if (!iso || !/^\d{4}-\d{2}-\d{2}/.test(iso)) return null;
+    const [a, m, d] = iso.slice(0, 10).split("-").map(Number);
+    const alvo = Date.UTC(a, m - 1, d);
+    const [ha, hm, hd] = hojeISO().split("-").map(Number);
+    return Math.round((alvo - Date.UTC(ha, hm - 1, hd)) / 86400000);
+  };
+  const el = (tag, attrs = {}, ...filhos) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? "" : v);
+    }
+    for (const f of filhos.flat()) if (f != null) n.append(f.nodeType ? f : String(f));
+    return n;
+  };
+  const idSeguro = (chave) => String(chave || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^A-Za-z0-9_\-~:@+]/g, "-").replace(/-+/g, "-").replace(/^[-.]+|[-.]+$/g, "").slice(0, 180);
+
+  let db = null;
+  let podeEditar = true;
+  let downloads = null;
+  let casos = [];
+  let lidos = [];
+  let abertoId = null;
+
+  // ------------------------------------------------------------------ dados
+
+  const devedorPrincipal = (c) => (c.devedores && c.devedores[0]) || {};
+  const proximoPrazo = (c) => {
+    const futuros = (c.prazos || []).filter((p) => p && p.data).sort((a, b) => a.data.localeCompare(b.data));
+    return futuros.find((p) => diasAte(p.data) >= 0) || futuros[futuros.length - 1] || null;
+  };
+  const ativo = (c) => c.status !== "encerrado";
+  const pendTrava = (c) => (c.pendencias || []).filter((p) => p && p.trava && !p.resolvida).length;
+
+  function classePrazo(iso) {
+    const d = diasAte(iso);
+    if (d == null) return "";
+    if (d < 0) return "vencido";
+    if (d <= 30) return "proximo";
+    return "";
+  }
+  function textoDias(iso) {
+    const d = diasAte(iso);
+    if (d == null) return "";
+    if (d < 0) return `vencido há ${-d} dia${d === -1 ? "" : "s"}`;
+    if (d === 0) return "vence hoje";
+    return `em ${d} dia${d === 1 ? "" : "s"}`;
+  }
+
+  // ------------------------------------------------------------------ render
+
+  function renderResumo() {
+    const at = casos.filter(ativo);
+    $("k-casos").textContent = at.length;
+    $("k-valor").textContent = dinheiro(at.reduce((s, c) => s + (Number(c.valor_causa) || 0), 0));
+    const prox = at.flatMap((c) => c.prazos || []).filter((p) => p && p.data && diasAte(p.data) != null && diasAte(p.data) <= 30).length;
+    $("k-prazos").textContent = prox;
+    $("k-prazos-box").classList.toggle("alerta", prox > 0);
+    const trava = at.reduce((s, c) => s + pendTrava(c), 0);
+    $("k-trava").textContent = trava;
+    $("k-trava-box").classList.toggle("alerta", trava > 0);
+  }
+
+  function filtrados() {
+    const q = $("f-busca").value.trim().toLowerCase();
+    const st = $("f-status").value;
+    const via = $("f-via").value;
+    return casos.filter((c) => {
+      if (st && c.status !== st) return false;
+      if (via && c.via !== via) return false;
+      if (!q) return true;
+      const alvo = [
+        ...(c.devedores || []).flatMap((d) => [d.nome, d.cpf_cnpj]),
+        c.credor && c.credor.nome, c.credor && c.credor.cpf_cnpj, c.processo, c.chave,
+      ].filter(Boolean).join(" ").toLowerCase();
+      return alvo.includes(q);
+    }).sort((a, b) => {
+      const pa = proximoPrazo(a), pb = proximoPrazo(b);
+      if (ativo(a) !== ativo(b)) return ativo(a) ? -1 : 1;
+      return (pa ? pa.data : "9999").localeCompare(pb ? pb.data : "9999");
+    });
+  }
+
+  function renderCarteira() {
+    const corpo = $("linhas");
+    corpo.replaceChildren();
+    const lista = filtrados();
+    $("vazio").hidden = casos.length > 0 && lista.length > 0;
+    if (casos.length > 0 && lista.length === 0) {
+      $("vazio").replaceChildren(el("strong", { text: "Nenhum caso corresponde aos filtros." }));
+    } else if (casos.length === 0) {
+      $("vazio").replaceChildren(
+        el("strong", { text: "Nenhum caso na carteira ainda." }),
+        el("span", { text: 'Cole o bloco REGISTRO-CASO entregue pelas skills na caixa "Importar registro". O caso aparece aqui.' }));
+    }
+    for (const c of lista) {
+      const dev = devedorPrincipal(c);
+      const outros = (c.devedores || []).length - 1;
+      const pz = proximoPrazo(c);
+      const trava = pendTrava(c);
+      corpo.append(el("tr", { tabindex: "0", onclick: () => abrir(c.id), onkeydown: (e) => { if (e.key === "Enter") abrir(c.id); } },
+        el("td", {},
+          el("div", { class: "nome", text: dev.nome || "(devedor sem nome)" }),
+          el("div", { class: "meta", text: [c.credor && c.credor.nome, outros > 0 ? `+${outros} no polo` : null, c.processo].filter(Boolean).join(" · ") }),
+          c.exemplo ? el("span", { class: "chip exemplo", text: "exemplo" }) : null),
+        el("td", { text: VIAS[c.via] || c.via || "—" }),
+        el("td", {},
+          el("span", { class: `chip ${c.status || ""}`, text: STATUS[c.status] || c.status || "—" }),
+          trava ? el("div", { class: "meta trava", text: `${trava} pendência${trava > 1 ? "s" : ""} trava${trava > 1 ? "m" : ""}` }) : null),
+        el("td", {}, pz
+          ? [el("div", { class: `prazo num ${classePrazo(pz.data)}`, text: dataBR(pz.data) }),
+             el("div", { class: "meta", text: PRAZOS[pz.tipo] || pz.descricao || pz.tipo || "" })]
+          : el("span", { class: "meta", text: "—" })),
+        el("td", { class: "valor", text: dinheiro(c.valor_causa) })));
+    }
+    $("faixa-exemplos").hidden = !(podeEditar && casos.some((c) => c.exemplo));
+    $("b-csv").hidden = !(downloads && casos.length);
+  }
+
+  function renderPrazos() {
+    const ul = $("prazos");
+    ul.replaceChildren();
+    const itens = casos.filter(ativo).flatMap((c) => (c.prazos || []).filter((p) => p && p.data && diasAte(p.data) >= -60)
+      .map((p) => ({ p, c }))).sort((a, b) => a.p.data.localeCompare(b.p.data)).slice(0, 12);
+    $("prazos-vazio").hidden = itens.length > 0;
+    for (const { p, c } of itens) {
+      ul.append(el("li", { tabindex: "0", onclick: () => abrir(c.id), onkeydown: (e) => { if (e.key === "Enter") abrir(c.id); } },
+        el("div", { class: `d prazo ${classePrazo(p.data)}` }, dataBR(p.data), el("br"), el("span", { class: "meta", text: textoDias(p.data) })),
+        el("div", { class: "t" }, PRAZOS[p.tipo] || p.tipo || "Prazo",
+          el("span", { text: [devedorPrincipal(c).nome, p.descricao].filter(Boolean).join(" · ") }))));
+    }
+  }
+
+  function renderTudo() {
+    renderResumo();
+    renderCarteira();
+    renderPrazos();
+    if (abertoId) {
+      const c = casos.find((x) => x.id === abertoId);
+      if (c && !document.querySelector("#ficha [data-sujo='1']")) desenharFicha(c);
+    }
+  }
+
+  // ------------------------------------------------------------------ ficha
+
+  function abrir(id) {
+    const c = casos.find((x) => x.id === id);
+    if (!c) return;
+    abertoId = id;
+    desenharFicha(c);
+    $("veu").hidden = false;
+    document.body.style.overflow = "hidden";
+    $("ficha").focus();
+  }
+  function fechar() {
+    abertoId = null;
+    $("veu").hidden = true;
+    document.body.style.overflow = "";
+  }
+  $("veu").addEventListener("click", (e) => { if (e.target === $("veu")) fechar(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("veu").hidden) fechar(); });
+
+  function desenharFicha(c) {
+    const f = $("ficha");
+    f.tabIndex = -1;
+    const dev = devedorPrincipal(c);
+    const par = (rotulo, valor) => el("div", {}, el("dt", { text: rotulo }), el("dd", { text: valor == null || valor === "" ? "—" : valor }));
+
+    const status = el("select", { id: "e-status" }, Object.entries(STATUS).map(([k, v]) => el("option", { value: k, text: v, selected: c.status === k })));
+    const processo = el("input", { type: "text", id: "e-processo", value: c.processo || "", placeholder: "0000000-00.0000.8.24.0000" });
+    const proximo = el("textarea", { id: "e-proximo", rows: "2", style: "font-family:var(--body);font-size:14px" });
+    proximo.value = c.proximo_passo || "";
+    const nota = el("textarea", { id: "e-nota", rows: "2", placeholder: "Registrar andamento, contato com o cliente, decisão…", style: "font-family:var(--body);font-size:14px" });
+    const marcaSujo = () => { f.dataset.sujo = "1"; };
+    [status, processo, proximo, nota].forEach((n) => n.addEventListener("input", marcaSujo));
+
+    const pendencias = (c.pendencias || []).map((p, i) => {
+      const cb = el("input", { type: "checkbox", id: `e-pend-${i}`, checked: !!p.resolvida, disabled: !podeEditar });
+      cb.addEventListener("change", marcaSujo);
+      return el("li", {}, el("label", { for: `e-pend-${i}` }, cb,
+        el("span", { class: p.resolvida ? "feita" : "" },
+          p.o_que || "(sem descrição)",
+          el("span", { class: "meta", text: ` · ${p.quem === "credor" ? "credor providencia" : p.quem === "escritorio" ? "escritório providencia" : p.quem || ""}` }),
+          p.trava && !p.resolvida ? el("span", { class: "meta trava", text: " · trava o ajuizamento" }) : null)));
+    });
+
+    const msg = el("p", { class: "meta", "aria-live": "polite" });
+    const salvar = el("button", { class: "btn primario", type: "button", text: "Salvar alterações", disabled: !podeEditar });
+    salvar.addEventListener("click", async () => {
+      salvar.disabled = true;
+      msg.textContent = "Salvando…";
+      const novasPend = (c.pendencias || []).map((p, i) => ({ ...p, resolvida: $(`e-pend-${i}`).checked }));
+      const mudou = [];
+      if (status.value !== c.status) mudou.push(`situação: ${STATUS[status.value]}`);
+      if ((processo.value.trim() || null) !== (c.processo || null)) mudou.push(`processo: ${processo.value.trim() || "removido"}`);
+      if (proximo.value.trim() !== (c.proximo_passo || "")) mudou.push("próximo passo atualizado");
+      const resolvidas = novasPend.filter((p, i) => p.resolvida && !(c.pendencias[i] || {}).resolvida).map((p) => p.o_que);
+      if (resolvidas.length) mudou.push(`resolvida: ${resolvidas.join("; ")}`);
+      const eventos = [...(c.eventos || [])];
+      if (mudou.length) eventos.push({ evento: "edicao", data_evento: hojeISO(), resumo: mudou.join(" · ") });
+      if (nota.value.trim()) eventos.push({ evento: "anotacao", data_evento: hojeISO(), resumo: nota.value.trim() });
+      try {
+        await db.doc(`casos/${c.id}`).update({
+          status: status.value,
+          processo: processo.value.trim() || null,
+          proximo_passo: proximo.value.trim(),
+          pendencias: novasPend,
+          eventos: eventos.slice(-MAX_EVENTOS),
+          atualizado_em: new Date().toISOString(),
+        });
+        delete f.dataset.sujo;
+        msg.textContent = "Alterações salvas.";
+      } catch (e) {
+        msg.textContent = mensagemErro(e);
+      } finally {
+        salvar.disabled = !podeEditar;
+      }
+    });
+
+    const zonaExcluir = el("div", { class: "acoes" });
+    const pedirExclusao = () => {
+      zonaExcluir.replaceChildren(el("div", { class: "confirma" },
+        el("span", { text: "Excluir este caso e todo o histórico? Não dá para desfazer." }),
+        el("button", { class: "btn perigo", type: "button", text: "Excluir", onclick: async () => {
+          try { await db.doc(`casos/${c.id}`).delete(); fechar(); } catch (e) { msg.textContent = mensagemErro(e); }
+        } }),
+        el("button", { class: "btn", type: "button", text: "Cancelar", onclick: () => zonaExcluir.replaceChildren(botaoExcluir) })));
+    };
+    const botaoExcluir = el("button", { class: "btn link", type: "button", text: "Excluir caso", onclick: pedirExclusao, disabled: !podeEditar });
+    zonaExcluir.append(botaoExcluir);
+
+    const titulos = (c.titulos || []).length
+      ? el("div", { class: "tabela" }, el("table", {},
+          el("thead", {}, el("tr", {}, el("th", { text: "Título" }), el("th", { text: "Nº" }), el("th", { text: "Vencimento" }), el("th", { class: "valor", text: "Valor de face" }))),
+          el("tbody", {}, c.titulos.map((t) => el("tr", { style: "cursor:default" },
+            el("td", { text: t.tipo || "—" }), el("td", { class: "num", text: t.numero || "—" }),
+            el("td", { class: "num", text: dataBR(t.vencimento) }), el("td", { class: "valor", text: dinheiro(t.valor_face) }))))))
+      : el("p", { class: "meta", text: "Nenhum título registrado." });
+
+    const prazos = (c.prazos || []).length
+      ? el("ul", { class: "lista-prazos" }, [...c.prazos].sort((a, b) => String(a.data).localeCompare(String(b.data))).map((p) =>
+          el("li", { style: "cursor:default" },
+            el("div", { class: `d prazo ${classePrazo(p.data)}` }, dataBR(p.data), el("br"), el("span", { class: "meta", text: textoDias(p.data) })),
+            el("div", { class: "t" }, PRAZOS[p.tipo] || p.tipo || "Prazo", el("span", { text: p.descricao || "" })))))
+      : el("p", { class: "meta", text: "Nenhum prazo registrado." });
+
+    const historico = el("ul", { class: "historico" }, [...(c.eventos || [])].reverse().map((ev) =>
+      el("li", {},
+        el("div", {}, el("strong", { text: EVENTOS[ev.evento] || ev.evento || "Evento" }), " ", el("span", { class: "q", text: dataBR(ev.data_evento) })),
+        ev.resumo ? el("div", { text: ev.resumo }) : null,
+        ev.skill ? el("div", { class: "q", text: `registrado pela skill ${ev.skill}` }) : null)));
+
+    f.replaceChildren(
+      el("div", { class: "cab" },
+        el("div", { style: "min-width:0" },
+          el("h3", { id: "ficha-titulo", text: dev.nome || "(devedor sem nome)" }),
+          el("p", { class: "meta", text: [VIAS[c.via] || c.via, c.credor && c.credor.nome, c.exemplo ? "caso de exemplo" : null].filter(Boolean).join(" · ") })),
+        el("button", { class: "btn", type: "button", text: "Fechar", onclick: fechar })),
+      el("section", { class: "bloco" },
+        el("dl", { class: "pares" },
+          par("Valor da causa", dinheiro(c.valor_causa)),
+          par("Data-base do débito", dataBR(c.data_base_debito)),
+          par("Foro", c.foro),
+          par("Processo", c.processo),
+          par("Credor", [c.credor && c.credor.nome, c.credor && c.credor.cpf_cnpj].filter(Boolean).join(" · ")),
+          par("Chave do caso", c.chave)),
+        el("dl", { class: "pares" }, (c.devedores || []).map((d) =>
+          par(d.papel ? d.papel.charAt(0).toUpperCase() + d.papel.slice(1) : "Devedor",
+            [d.nome, d.cpf_cnpj, d.rural ? "produtor rural" : null].filter(Boolean).join(" · "))))),
+      el("section", { class: "bloco" }, el("h2", { text: "Andamento" }),
+        el("div", { class: "form-grid" },
+          el("label", { class: "campo", for: "e-status" }, "Situação", status),
+          el("label", { class: "campo", for: "e-processo" }, "Número do processo", processo)),
+        el("label", { class: "campo", for: "e-proximo" }, "Próximo passo", proximo),
+        el("label", { class: "campo", for: "e-nota" }, "Nova anotação (entra no histórico)", nota),
+        pendencias.length ? el("div", {}, el("h2", { text: "Pendências", style: "margin-bottom:6px" }), el("ul", { class: "pend" }, pendencias)) : null,
+        el("div", { class: "acoes" }, salvar, msg)),
+      el("section", { class: "bloco" }, el("h2", { text: "Prazos" }), prazos),
+      el("section", { class: "bloco" }, el("h2", { text: "Títulos" }), titulos),
+      c.observacoes ? el("section", { class: "bloco" }, el("h2", { text: "Observações" }), el("p", { text: c.observacoes })) : null,
+      el("section", { class: "bloco" }, el("h2", { text: "Histórico" }), historico),
+      zonaExcluir);
+  }
+
+  // ------------------------------------------------------------------ importação
+
+  function extrairRegistros(texto) {
+    const blocos = [];
+    const cerca = /```\s*REGISTRO-CASO\s*\n([\s\S]*?)```/gi;
+    let m;
+    while ((m = cerca.exec(texto))) blocos.push(m[1]);
+    if (!blocos.length) {
+      // sem a cerca: aceita um ou mais objetos JSON colados diretamente
+      let prof = 0, ini = -1, emStr = false, esc = false;
+      for (let i = 0; i < texto.length; i++) {
+        const ch = texto[i];
+        if (emStr) { if (esc) esc = false; else if (ch === "\\") esc = true; else if (ch === '"') emStr = false; continue; }
+        if (ch === '"') emStr = true;
+        else if (ch === "{") { if (prof === 0) ini = i; prof++; }
+        else if (ch === "}") { prof--; if (prof === 0 && ini >= 0) { blocos.push(texto.slice(ini, i + 1)); ini = -1; } }
+      }
+    }
+    const ok = [], erros = [];
+    blocos.forEach((b, i) => {
+      try {
+        const r = JSON.parse(b.trim());
+        if (!r || typeof r !== "object" || Array.isArray(r)) throw new Error("não é um objeto");
+        if (!r.chave) throw new Error('falta o campo "chave"');
+        const id = idSeguro(r.chave);
+        if (!id) throw new Error('o campo "chave" está vazio');
+        ok.push({ ...r, _id: id });
+      } catch (e) {
+        erros.push(`Bloco ${i + 1}: ${e.message.replace(/^JSON\.parse: /, "")}`);
+      }
+    });
+    if (!blocos.length) erros.push("Não encontrei nenhum bloco REGISTRO-CASO no texto colado.");
+    return { ok, erros };
+  }
+
+  function fundir(atual, r) {
+    const base = atual ? { ...atual } : {};
+    delete base.id;
+    const campos = ["chave", "via", "valor_causa", "data_base_debito", "foro", "processo", "status", "proximo_passo", "observacoes"];
+    for (const k of campos) if (r[k] !== undefined && r[k] !== null && r[k] !== "") base[k] = r[k];
+    if (r.credor && (r.credor.nome || r.credor.cpf_cnpj)) base.credor = r.credor;
+    for (const k of ["devedores", "titulos", "pendencias"]) if (Array.isArray(r[k]) && r[k].length) base[k] = r[k];
+    if (Array.isArray(r.prazos)) {
+      const mapa = new Map((base.prazos || []).map((p) => [`${p.tipo}|${p.data}`, p]));
+      for (const p of r.prazos) if (p && p.data) mapa.set(`${p.tipo}|${p.data}`, p);
+      base.prazos = [...mapa.values()];
+    }
+    const resumo = [r.status && `situação: ${STATUS[r.status] || r.status}`, r.proximo_passo && `próximo passo: ${r.proximo_passo}`]
+      .filter(Boolean).join(" · ");
+    base.eventos = [...(base.eventos || []), {
+      evento: r.evento || "registro", data_evento: r.data_evento || hojeISO(), skill: r.skill || null, resumo,
+    }].slice(-MAX_EVENTOS);
+    base.exemplo = false;
+    base.atualizado_em = new Date().toISOString();
+    if (!atual) base.criado_em = base.atualizado_em;
+    return base;
+  }
+
+  $("entrada").addEventListener("input", () => { lidos = []; $("b-importar").disabled = true; $("previa").replaceChildren(); });
+  $("entrada").addEventListener("paste", () => setTimeout(conferir, 0));
+  $("b-ler").addEventListener("click", conferir);
+
+  function conferir() {
+    const { ok, erros } = extrairRegistros($("entrada").value);
+    lidos = ok;
+    const p = $("previa");
+    p.replaceChildren();
+    if (ok.length) {
+      p.append(el("p", { text: `${ok.length} registro${ok.length > 1 ? "s" : ""} pronto${ok.length > 1 ? "s" : ""} para importar:` }),
+        el("ul", {}, ok.map((r) => {
+          const existe = casos.some((c) => c.id === r._id);
+          const nome = (r.devedores && r.devedores[0] && r.devedores[0].nome) || r.chave;
+          return el("li", { text: `${nome} · ${VIAS[r.via] || r.via || "via não informada"} · ${existe ? "atualiza o caso existente" : "caso novo"}` });
+        })));
+    }
+    if (erros.length) p.append(el("div", { class: "aviso erro" }, el("span", { text: erros.join(" ") })));
+    $("b-importar").disabled = !(ok.length && db && podeEditar);
+  }
+
+  $("b-importar").addEventListener("click", async () => {
+    const btn = $("b-importar");
+    btn.disabled = true;
+    const p = $("previa");
+    let feitos = 0;
+    try {
+      for (const r of lidos) {
+        const ref = db.doc(`casos/${r._id}`);
+        const atual = await ref.get();
+        const corpo = fundir(atual.exists ? atual.data() : null, r);
+        await ref.set(corpo);
+        feitos++;
+      }
+      p.replaceChildren(el("p", { text: `${feitos} registro${feitos > 1 ? "s" : ""} importado${feitos > 1 ? "s" : ""}.` }));
+      $("entrada").value = "";
+      lidos = [];
+    } catch (e) {
+      p.append(el("div", { class: "aviso erro" }, el("span", { text: `Importei ${feitos} de ${lidos.length}. ${mensagemErro(e)}` })));
+      btn.disabled = false;
+    }
+  });
+
+  // ------------------------------------------------------------------ exemplos e planilha
+
+  $("b-excluir-exemplos").addEventListener("click", async (ev) => {
+    const b = ev.currentTarget;
+    b.disabled = true;
+    try {
+      for (const c of casos.filter((x) => x.exemplo)) await db.doc(`casos/${c.id}`).delete();
+    } catch (e) {
+      mostrarAviso(mensagemErro(e));
+    } finally {
+      b.disabled = false;
+    }
+  });
+
+  $("b-csv").addEventListener("click", async () => {
+    const cab = ["Devedor", "CPF/CNPJ", "Credor", "Via", "Situação", "Valor da causa", "Processo", "Foro", "Próximo prazo", "Tipo do prazo", "Pendências que travam", "Próximo passo"];
+    const esc = (v) => {
+      const s = v == null ? "" : String(v);
+      return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const linhas = casos.filter((c) => !c.exemplo).map((c) => {
+      const d = devedorPrincipal(c), pz = proximoPrazo(c);
+      return [d.nome, d.cpf_cnpj, c.credor && c.credor.nome, VIAS[c.via] || c.via, STATUS[c.status] || c.status,
+        typeof c.valor_causa === "number" ? c.valor_causa.toFixed(2).replace(".", ",") : "",
+        c.processo, c.foro, pz ? dataBR(pz.data) : "", pz ? (PRAZOS[pz.tipo] || pz.tipo) : "", pendTrava(c), c.proximo_passo];
+    });
+    const csv = "﻿" + [cab, ...linhas].map((l) => l.map(esc).join(";")).join("\r\n");
+    try {
+      await downloads.save({ filename: `carteira-${hojeISO()}.csv`, data: csv });
+    } catch (e) {
+      if (e && e.code !== "cancelled" && e.code !== "declined") mostrarAviso("Não foi possível gerar a planilha agora. Tente novamente.");
+    }
+  });
+
+  // ------------------------------------------------------------------ infraestrutura
+
+  function mensagemErro(e) {
+    const c = e && e.code;
+    if (c === "invalid_argument") return "A base de dados recusou a gravação. Confira se você está com a sua conta, como dono do painel.";
+    if (c === "quota_exceeded") return "A base de dados do painel está cheia. Exclua casos encerrados antigos e tente de novo.";
+    if (c === "resource_exhausted") return "Muitas operações seguidas. Aguarde alguns segundos e tente de novo.";
+    return "Não consegui falar com a base de dados agora. Tente de novo em instantes.";
+  }
+  function mostrarAviso(texto) {
+    const a = $("aviso-geral");
+    a.className = "aviso erro";
+    a.replaceChildren(el("span", { text: texto }));
+    a.hidden = false;
+  }
+
+  for (const [k, v] of Object.entries(STATUS)) $("f-status").append(el("option", { value: k, text: v }));
+  for (const [k, v] of Object.entries(VIAS)) $("f-via").append(el("option", { value: k, text: v }));
+  ["f-busca", "f-status", "f-via"].forEach((id) => $(id).addEventListener("input", renderCarteira));
+  renderTudo();
+
+  (async () => {
+    db = await claude.use("db");
+    if (!db) {
+      $("estado").textContent = "Sem conexão com a base de dados";
+      mostrarAviso("Abra este painel no claude.ai, com a sua conta, para ver e gravar a carteira.");
+      $("b-ler").disabled = false;
+      return;
+    }
+    const user = await claude.use("user");
+    if (user) {
+      const pode = await user.can("data.write");
+      if (pode === false) podeEditar = false;
+    }
+    downloads = await claude.use("downloads");
+    if (!podeEditar) {
+      $("entrada").disabled = true;
+      $("b-ler").disabled = true;
+      $("estado").textContent = "Somente leitura";
+    }
+    db.collection("casos").onSnapshot((snap) => {
+      casos = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      $("estado").textContent = `Atualizado às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+      renderTudo();
+    }, (e) => {
+      $("estado").textContent = "Conexão interrompida";
+      mostrarAviso(mensagemErro(e) + " Recarregue a página.");
+    });
+  })();
+})();
+</script>

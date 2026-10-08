@@ -15,6 +15,8 @@ skills/<nome>/            uma pasta por skill, pronta para empacotar
   SKILL.md
   compartilhado.txt       quais arquivos de compartilhado/ a skill recebe
   references/ scripts/ assets/
+painel/
+  painel-de-casos.html    Painel de Casos (página no claude.ai, base de dados privada)
 ferramentas/
   sincronizar.py          copia o compartilhado, valida e gera dist/<nome>.zip
 ```
@@ -56,7 +58,7 @@ Contencioso                                                                     
 | h | revisão de prescrição da carteira | a fazer |
 | i | acompanhamento de acordos | a fazer |
 | j | `onboarding-cliente` | a fazer |
-| k | painel da carteira | a fazer (formato do registro já definido) |
+| k | painel da carteira | versão 1 publicada (`painel/painel-de-casos.html`) |
 | l | `notificacao-extrajudicial` | a fazer |
 
 ## Privacidade
